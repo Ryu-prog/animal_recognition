@@ -60,7 +60,10 @@ if img_source == "画像をアップロード" and isinstance(img_file, list) an
                     new_name = f"{i+1}_{top_result[0]}.{ext}"
                     zip_file.writestr(new_name, img_bytes)
             zip_buffer.seek(0)
-            st.download_button(label="ZIPファイルをダウンロード", data=zip_buffer, file_name="animal_images.zip", mime="application/zip")
+            st.session_state['zip_data'] = zip_buffer.getvalue()
+
+    if 'zip_data' in st.session_state:
+            st.download_button(label="ZIPファイルをダウンロード", data=st.session_state['zip_data'], file_name="animal_images.zip", mime="application/zip")
 
 else:
     # 単一ファイルの場合（カメラまたはアップロードの単一）
