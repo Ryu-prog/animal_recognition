@@ -25,15 +25,17 @@ with st.spinner("推定中..."):
     # 画像の読み込み
     if img_source == "カメラで撮影":
         img = Image.open(img_file)
+        img_bytes = img_file.getvalue()
     else:
-        img = Image.open(io.BytesIO(img_file.getvalue()))
+        img_bytes = img_file.getvalue()
+        img = Image.open(io.BytesIO(img_bytes))
 
     img = img.convert("RGB")
 
     st.image(img, caption="対象の画像", width=480)
 
     # 予測
-    results = predict(img)
+    results = predict(img_bytes)
 
     # 結果の表示
     st.subheader("判定結果")
