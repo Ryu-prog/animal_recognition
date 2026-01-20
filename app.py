@@ -17,8 +17,8 @@ if img_source == "画像をアップロード":
 else:
     img_file = st.camera_input("カメラで撮影")
 
-# img_file が None のときは何もしない
-if img_file is None:
+# img_file が None または空リストのときは何もしない
+if not img_file:
     st.stop()
 
 # 予測関数をキャッシュ
@@ -70,6 +70,7 @@ else:
         if img_source == "カメラで撮影":
             img = Image.open(img_file)
             img_bytes = img_file.getvalue()
+            ext = 'jpg'
         else:
             # アップロードの単一ファイル（リストの最初の要素）
             file = img_file[0]
@@ -105,10 +106,6 @@ else:
         # ダウンロードボタン　- 予測結果がある場合のみ表示
         if results:
             top_result = results[0]
-            if img_source == "画像をアップロード":
-                ext = img_file.name.split('.')[-1]
-            else:
-                ext = 'jpg'
             new_name = f"{top_result[0]}.{ext}"
             img_bytes = io.BytesIO()
             img.save(img_bytes, format='JPEG')
