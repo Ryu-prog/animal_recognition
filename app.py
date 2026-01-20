@@ -71,8 +71,11 @@ else:
             img = Image.open(img_file)
             img_bytes = img_file.getvalue()
         else:
-            img_bytes = img_file.getvalue()
+            # アップロードの単一ファイル（リストの最初の要素）
+            file = img_file[0]
+            img_bytes = file.getvalue()
             img = Image.open(io.BytesIO(img_bytes))
+            ext = file.name.split('.')[-1]
 
         img = img.convert("RGB")
 
