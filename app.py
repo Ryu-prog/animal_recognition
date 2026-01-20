@@ -28,7 +28,7 @@ def cached_predict(img_bytes):
 
 
 # 複数ファイルの場合の処理
-if img_source == "画像をアップロード" and isinstance(img_file, list):
+if img_source == "画像をアップロード" and isinstance(img_file, list) and len(img_file) > 1:
     # 上限10ファイル
     img_files = img_file[:10] if len(img_file) > 10 else img_file
     
