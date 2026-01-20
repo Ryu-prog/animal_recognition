@@ -41,14 +41,26 @@ with st.spinner("推定中..."):
     for result in results[:n_top]:
         st.write(f"{round(result[2]*100, 2)}% の確率で {result[0]} です。")
 
-    # 円グラフ
-    pie_labels = [result[1] for result in results[:n_top]] + ["others"]
-    pie_probs = [result[2] for result in results[:n_top]] + \
-                [sum([result[2] for result in results[n_top:]])]
+    # ダウンロードボタン
+    top_result = results[0]
+    if img_source == "画像をアップロード":
+        ext = img_file.name.split('.')[-1]
+    else:
+        ext = 'jpg'
+    new_name = f"{top_result[0]}.{ext}"
+    img_bytes = io.BytesIO()
+    img.save(img_bytes, format='JPEG')
+    img_bytes = img_bytes.getvalue()
+    st.download_button(label="画像をダウンロード", data=img_bytes, file_name=new_name, mime="image/jpeg")
 
-    fig, ax = plt.subplots()
-    wedgeprops = {"width": 0.3, "edgecolor": "white"}
-    textprops = {"fontsize": 6}
-    ax.pie(pie_probs, labels=pie_labels, counterclock=False, startangle=90,
-           textprops=textprops, autopct="%.2f", wedgeprops=wedgeprops)
-    st.pyplot(fig)
+    # # 円グラフ
+    # pie_labels = [result[1] for result in results[:n_top]] + ["others"]
+    # pie_probs = [result[2] for result in results[:n_top]] + \
+    #             [sum([result[2] for result in results[n_top:]])]
+
+    # fig, ax = plt.subplots()
+    # wedgeprops = {"width": 0.3, "edgecolor": "white"}
+    # textprops = {"fontsize": 6}
+    # ax.pie(pie_probs, labels=pie_labels, counterclock=False, startangle=90,
+    #        textprops=textprops, autopct="%.2f", wedgeprops=wedgeprops)
+    # st.pyplot(fig)
