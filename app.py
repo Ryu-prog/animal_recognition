@@ -21,6 +21,13 @@ else:
 if not img_file:
     st.stop()
 
+# 複数判定を明示
+is_multiple = (img_source == "画像をアップロード" and isinstance(img_file, list) and len(img_file) > 1)
+
+# 切り替え時に古いzipデータを消す（不要なダウンロードボタン表示を防止）
+if not is_multiple and 'zip_data' in st.session_state:
+    st.session_state.pop('zip_data')
+
 # 予測関数をキャッシュ
 @st.cache_data
 def cached_predict(img_bytes):
@@ -28,7 +35,7 @@ def cached_predict(img_bytes):
 
 
 # 複数ファイルの場合の処理
-if img_source == "画像をアップロード" and isinstance(img_file, list) and len(img_file) > 1:
+if is_multiple:
     # 上限10ファイル
     img_files = img_file[:10] if len(img_file) > 10 else img_file
     
@@ -50,12 +57,13 @@ if img_source == "画像をアップロード" and isinstance(img_file, list) an
     
     # ダウンロードボタン（ZIPファイル）
     if len(images) > 0:
-        if st.button("画像をダウンロード"):
+        if st.button("ZIPを作成"):
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
                 for i, ((img, ext), top_result) in enumerate(zip(images, results_list)):
                     img_bytes = io.BytesIO()
-                    img.save(img_bytes, format='JPEG')
+                    fmt = 'JPEG' if ext.lower() in ('jpg', 'jpeg') else ext.upper()
+                    img.save(img_bytes, format=fmt)
                     img_bytes = img_bytes.getvalue()
                     new_name = f"{i+1}_{top_result[0]}.{ext}"
                     zip_file.writestr(new_name, img_bytes)
@@ -65,7 +73,7 @@ if img_source == "画像をアップロード" and isinstance(img_file, list) an
     if 'zip_data' in st.session_state:
             st.download_button(label="ZIPファイルをダウンロード", data=st.session_state['zip_data'], file_name="animal_images.zip", mime="application/zip")
 
-else:
+if not is_multiple:
     # 単一ファイルの場合（カメラまたはアップロードの単一）
     with st.spinner("推定中..."):
 
@@ -111,8 +119,10 @@ else:
             top_result = results[0]
             new_name = f"{top_result[0]}.{ext}"
             img_bytes = io.BytesIO()
-            img.save(img_bytes, format='JPEG')
+            fmt = 'JPEG' if ext.lower() in ('jpg', 'jpeg') else ext.upper()
+            img.save(img_bytes, format=fmt)
             img_bytes = img_bytes.getvalue()
-            st.download_button(label="画像をダウンロード", data=img_bytes, file_name=new_name, mime="image/jpeg")
+            mime = "image/jpeg" if fmt == "JPEG" else f"image/{ext.lower()}"
+            st.download_button(label="画像をダウンロード", data=img_bytes, file_name=new_name, mime=mime)
 
     
