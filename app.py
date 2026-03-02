@@ -4,6 +4,8 @@ from PIL import Image
 from model import predict
 import io
 import zipfile
+import os
+from datetime import datetime
 
 st.sidebar.title("動物認識アプリ")
 st.sidebar.write("生成AIを使って動物園の写真に写っている動物を判定します。")
@@ -70,8 +72,10 @@ if is_multiple:
             zip_buffer.seek(0)
             st.session_state['zip_data'] = zip_buffer.getvalue()
 
+    # ZIPファイル名にダウンロード日を追加
+    zip_file_name = f"animal_images_{datetime.now().strftime('%Y-%m-%d')}.zip"
     if 'zip_data' in st.session_state:
-            st.download_button(label="ZIPファイルをダウンロード", data=st.session_state['zip_data'], file_name="animal_images.zip", mime="application/zip")
+            st.download_button(label="ZIPファイルをダウンロード", data=st.session_state['zip_data'], file_name=zip_file_name, mime="application/zip")
 
 if not is_multiple:
     # 単一ファイルの場合（カメラまたはアップロードの単一）
@@ -125,4 +129,4 @@ if not is_multiple:
             mime = "image/jpeg" if fmt == "JPEG" else f"image/{ext.lower()}"
             st.download_button(label="画像をダウンロード", data=img_bytes, file_name=new_name, mime=mime)
 
-    
+
